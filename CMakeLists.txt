@@ -28,8 +28,6 @@ if (("${MKMMDB_HAVE_MAXMINDDB_H}" STREQUAL "") OR
 endif()
 list(APPEND MKMMDB_LIBS "${LIBMAXMINDDB_LIBRARY}")
 
-find_package(CURL REQUIRED)
-
 # Compiler flags
 # --------------
 
@@ -39,7 +37,7 @@ MkSetCompilerFlags()
 # ------------------
 
 set(MKMMDB_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-    ${CURL_INCLUDE_DIRS} ${CMAKE_REQUIRED_INCLUDES})
+    ${CMAKE_REQUIRED_INCLUDES})
 
 add_library(mkmmdb mkmmdb.cpp)
 add_executable(mkmmdb-client mkmmdb-client.cpp)
