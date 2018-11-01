@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
   }
   std::string ip = argv[1];
   {
-    mkmmdb_uptr db{mkmmdb_open("country.mmdb")};
+    mkmmdb_uptr db{mkmmdb_open_nonnull("country.mmdb")};
     if (!mkmmdb_good(db.get())) {
       std::clog << "Cannot open country.mmdb" << std::endl;
       // FALLTHROUGH
@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
     std::clog << "CC: " << s << std::endl;
   }
   {
-    mkmmdb_uptr db{mkmmdb_open("asn.mmdb")};
+    mkmmdb_uptr db{mkmmdb_open_nonnull("asn.mmdb")};
     if (!mkmmdb_good(db.get())) {
       std::clog << "Cannot open asn.mmdb" << std::endl;
       // FALLTHROUGH

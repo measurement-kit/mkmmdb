@@ -14,11 +14,11 @@ extern "C" {
 /// mkmmdb_t is a MMDB database.
 typedef struct mkmmdb mkmmdb_t;
 
-/// mkmmdb_open opens a database pointing to @p path. It always returns a
-/// valid pointer. Call mkmmdb_good to understand whether the database was
+/// mkmmdb_open_nonnull opens a database pointing to @p path. It always returns
+/// a valid pointer. Call mkmmdb_good to understand whether the database was
 /// successfully openned or not. This function will call abort when
 /// the @p path argument is a null pointer.
-mkmmdb_t *mkmmdb_open(const char *path);
+mkmmdb_t *mkmmdb_open_nonnull(const char *path);
 
 /// mkmmdb_good returns true if the database has been successfully open
 /// and false otherwise. This function aborts if @p mmdb is null.
@@ -113,7 +113,7 @@ struct mkmmdb {
 #define MKMMDB_ABORT abort
 #endif
 
-mkmmdb_t *mkmmdb_open(const char *path) {
+mkmmdb_t *mkmmdb_open_nonnull(const char *path) {
   if (path == nullptr) {
     MKMMDB_ABORT();
   }
