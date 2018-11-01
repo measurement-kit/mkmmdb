@@ -40,10 +40,7 @@ set(MKMMDB_INCLUDES ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_REQUIRED_INCLUDES})
 
 include_directories(${MKMMDB_INCLUDES})
-link_libraries("${MKMMDB_LIBS}")
 
-add_library(mkmmdb mkmmdb.cpp)
-add_executable(mkmmdb-client mkmmdb-client.cpp)
 if("${WIN32}" OR "${MINGW}")
   list(APPEND MKMMDB_LIBS "ws2_32")
   if ("${MINGW}")
@@ -51,6 +48,10 @@ if("${WIN32}" OR "${MINGW}")
   endif()
 endif()
 list(APPEND MKMMDB_LIBS Threads::Threads)
+link_libraries("${MKMMDB_LIBS}")
+
+add_library(mkmmdb mkmmdb.cpp)
+add_executable(mkmmdb-client mkmmdb-client.cpp)
 target_link_libraries(mkmmdb-client mkmmdb)
 
 # Testing
