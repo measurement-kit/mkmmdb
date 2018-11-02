@@ -14,11 +14,11 @@ extern "C" {
 /// mkmmdb_t is a MMDB database.
 typedef struct mkmmdb mkmmdb_t;
 
-/// mkmmdb_open opens a database pointing to @p path. It always returns a
-/// valid pointer. Call mkmmdb_good to understand whether the database was
-/// successfully openned or not. This function will call std::abort when
+/// mkmmdb_open_nonnull opens a database pointing to @p path. It always returns
+/// a valid pointer. Call mkmmdb_good to understand whether the database was
+/// successfully openned or not. This function will call abort when
 /// the @p path argument is a null pointer.
-mkmmdb_t *mkmmdb_open(const char *path);
+mkmmdb_t *mkmmdb_open_nonnull(const char *path);
 
 /// mkmmdb_good returns true if the database has been successfully open
 /// and false otherwise. This function aborts if @p mmdb is null.
@@ -28,24 +28,24 @@ int64_t mkmmdb_good(mkmmdb_t *mmdb);
 /// @p mmdb database, or the empty string on failure. The returned string
 /// will be valid until @p mmdb is valid _and_ you don't call other
 /// functions using the same @p mmdb instance. This function calls
-/// std::abort if passed null parameters.
+/// abort if passed null parameters.
 const char *mkmmdb_lookup_cc(mkmmdb_t *mmdb, const char *ip);
 
 /// mkmmdb_lookup_asn is like mkmmdb_lookup_cc but returns
 /// the ASN on success and zero on failure. Also this function
-/// calls std::abort if passed null parameters.
+/// calls abort if passed null parameters.
 int64_t mkmmdb_lookup_asn(mkmmdb_t *mmdb, const char *ip);
 
 /// mkmmdb_lookup_org is like mkmmdb_lookup_cc but returns
 /// the organization bound to @p ip on success, the empty string on
 /// failure. The returned string will be valid until @p mmdb is
 /// valid _and_ you don't call other lookup APIs using the
-/// same @p mmdb instance. This function calls std::abort if
+/// same @p mmdb instance. This function calls abort if
 /// passed a null @p mmdb or a null @p ip.
 const char *mkmmdb_lookup_org(mkmmdb_t *mmdb, const char *ip);
 
 /// mkmmdb_get_last_lookup_logs returns the logs of the last lookup
-/// or an empty string. Calls std::abort if @p mmdb is null.
+/// or an empty string. Calls abort if @p mmdb is null.
 const char *mkmmdb_get_last_lookup_logs(mkmmdb_t *mmdb);
 
 /// mkmmdb_close closes @p mmdb. Note that @p mmdb MAY be null.
@@ -109,11 +109,11 @@ struct mkmmdb {
 #endif
 
 #ifndef MKMMDB_ABORT
-// MKMMDB_ABORT allows to mock std::abort
-#define MKMMDB_ABORT std::abort
+// MKMMDB_ABORT allows to mock abort
+#define MKMMDB_ABORT abort
 #endif
 
-mkmmdb_t *mkmmdb_open(const char *path) {
+mkmmdb_t *mkmmdb_open_nonnull(const char *path) {
   if (path == nullptr) {
     MKMMDB_ABORT();
   }
