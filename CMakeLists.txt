@@ -8,6 +8,7 @@ include(MkUtils)
 # ---------------------
 
 MkDownloadMMDBDatabases()
+MkDownloadMeasurementKitMkMock()
 
 if("${MSVC}")
   MkDownloadMeasurementKitPrebuiltWindowsLibmaxminddb()
