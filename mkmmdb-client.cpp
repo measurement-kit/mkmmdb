@@ -65,45 +65,24 @@ int main(int, char **argv) {
     ip = cmdline.pos_args()[1];
   }
   std::clog << std::boolalpha;
-  {
-    std::vector<std::string> logs;
-    mk::mmdb::Handle db;
-    std::string cc;
-    bool ok = db.open(country_db, logs);
-    std::clog << "open: " << ok << std::endl;
-    if (ok || keep_going) {
-      ok = db.lookup_cc(ip, cc, logs);
-      std::clog << "lookup_cc: " << ok << std::endl;
-      std::clog << "cc: " << cc << std::endl;
-    }
-    std::clog << "=== BEGIN LOGS === " << std::endl;
-    for (const std::string &s : logs) {
-      std::clog << s;
-    }
-    std::clog << "=== END LOGS === " << std::endl;
-    if (!ok && !keep_going) exit(EXIT_FAILURE);
-  }
-  {
-    std::vector<std::string> logs;
-    mk::mmdb::Handle db;
-    std::string asn, org;
-    bool ok = db.open(asn_db, logs);
-    std::clog << "open: " << ok << std::endl;
-    if (ok || keep_going) {
-      ok = db.lookup_asn(ip, asn, logs);
-      std::clog << "lookup_asn: " << ok << std::endl;
-      std::clog << "asn: " << asn << std::endl;
-    }
-    if (ok || keep_going) {
-      ok = db.lookup_org(ip, org, logs);
-      std::clog << "lookup_org: " << ok << std::endl;
-      std::clog << "org: " << org << std::endl;
-    }
-    std::clog << "=== BEGIN LOGS === " << std::endl;
-    for (const std::string &s : logs) {
-      std::clog << s;
-    }
-    std::clog << "=== END LOGS === " << std::endl;
-    if (!ok && !keep_going) exit(EXIT_FAILURE);
-  }
+#define LOOKUP(Database, Feature)                          \
+  do {                                                     \
+    std::vector<std::string> logs;                         \
+    mk::mmdb::Handle db;                                   \
+    std::string value;                                     \
+    bool ok = db.open(Database, logs);                     \
+    std::clog << "open: " << ok << std::endl;              \
+    ok = ok || keep_going;                                 \
+    if (ok) {                                              \
+      ok = db.lookup_##Feature(ip, value, logs);           \
+      std::clog << "lookup: " << ok << std::endl;          \
+      ok = ok || keep_going;                               \
+      std::clog << #Feature << ": " << value << std::endl; \
+    }                                                      \
+    for (const std::string &s : logs) std::clog << s;      \
+    if (!ok) exit(EXIT_FAILURE);                           \
+  } while (0)
+  LOOKUP(country_db, cc);
+  LOOKUP(asn_db, asn);
+  LOOKUP(asn_db, org);
 }
