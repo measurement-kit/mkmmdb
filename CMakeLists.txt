@@ -8,6 +8,7 @@ include(MkUtils)
 # ---------------------
 
 MkDownloadMMDBDatabases()
+MkDownloadCatchorgCatch2()
 MkDownloadMeasurementKitMkMock()
 MkDownloadAdishavitArgh()
 
@@ -55,6 +56,8 @@ link_libraries("${MKMMDB_LIBS}")
 add_library(mkmmdb mkmmdb.cpp)
 add_executable(mkmmdb-client mkmmdb-client.cpp)
 target_link_libraries(mkmmdb-client mkmmdb)
+add_executable(unit-tests unit-tests.cpp)
+target_link_libraries(unit-tests mkmmdb)
 
 # Testing
 # -------
@@ -62,6 +65,7 @@ target_link_libraries(mkmmdb-client mkmmdb)
 set(BUILD_TESTING "ON" CACHE BOOL "Whether to build tests")
 if(${BUILD_TESTING})
   enable_testing()
+  add_test(NAME unit_tests COMMAND unit-tests)
   add_test(NAME basic_test COMMAND mkmmdb-client 8.8.8.8)
   add_test(NAME name_not_found_test COMMAND mkmmdb-client -k 127.0.0.1)
   add_test(NAME invalid_ip_test COMMAND mkmmdb-client -k 8.8.8.x)

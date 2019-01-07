@@ -198,7 +198,8 @@ bool Handle::Impl::finish_lookup_cc(MMDB_entry_s *entry, std::string &cc,
   MMDB_entry_data_s data{};
   auto mmdb_error = MMDB_get_value(
       entry, &data, "registered_country", "iso_code", nullptr);
-  MKMOCK_HOOK(MMDB_get_value_registered_country_iso_code, mmdb_error);
+  MKMOCK_HOOK(MMDB_get_value_registered_country_iso_code_error, mmdb_error);
+  MKMOCK_HOOK(MMDB_get_value_registered_country_iso_code_data, data);
   if (mmdb_error != 0) {
     MKMMDB_LOG(logs, "MMDB_get_value: " << MMDB_strerror(mmdb_error));
     return false;
@@ -229,7 +230,8 @@ bool Handle::Impl::finish_lookup_asn(MMDB_entry_s *entry, std::string &asn,
   MMDB_entry_data_s data{};
   auto mmdb_error = MMDB_get_value(
       entry, &data, "autonomous_system_number", nullptr);
-  MKMOCK_HOOK(MMDB_get_value_autonomous_system_number, mmdb_error);
+  MKMOCK_HOOK(MMDB_get_value_autonomous_system_number_error, mmdb_error);
+  MKMOCK_HOOK(MMDB_get_value_autonomous_system_number_data, data);
   if (mmdb_error != 0) {
     MKMMDB_LOG(logs, "MMDB_get_value: " << MMDB_strerror(mmdb_error));
     return false;
@@ -261,7 +263,9 @@ bool Handle::Impl::finish_lookup_org(MMDB_entry_s *entry, std::string &org,
   auto mmdb_error = MMDB_get_value(
       entry, &data, "autonomous_system_organization", nullptr);
   MKMOCK_HOOK(
-      MMDB_get_value_autonomous_system_organization, mmdb_error);
+      MMDB_get_value_autonomous_system_organization_error, mmdb_error);
+  MKMOCK_HOOK(
+      MMDB_get_value_autonomous_system_organization_data, data);
   if (mmdb_error != 0) {
     MKMMDB_LOG(logs, "MMDB_get_value: " << MMDB_strerror(mmdb_error));
     return false;
