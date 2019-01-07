@@ -98,5 +98,8 @@ TEST_CASE("When lookup_org fails because MMDB provides us a bad value") {
 }
 
 TEST_CASE("MKMMDB_ABORT_IF_NULLPTR works as expected") {
-  REQUIRE_THROWS([]() { MKMMDB_ABORT_IF_NULLPTR(nullptr); }());
+  REQUIRE_THROWS([]() {
+      const char *p = nullptr;
+      MKMMDB_ABORT_IF_NULLPTR(p);
+  }());
 }
