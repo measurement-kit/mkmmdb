@@ -69,6 +69,8 @@ if(${BUILD_TESTING})
   add_test(NAME basic_test COMMAND mkmmdb-client 8.8.8.8)
   add_test(NAME name_not_found_test COMMAND mkmmdb-client -k 127.0.0.1)
   add_test(NAME invalid_ip_test COMMAND mkmmdb-client -k 8.8.8.x)
-  add_test(NAME nonexistent_db COMMAND mkmmdb-client -k
+  add_test(NAME nonexistent_asn_db COMMAND mkmmdb-client -k
            --asn-db non-existent.mmdb 8.8.8.8)
+  add_test(NAME nonexistent_country_db COMMAND mkmmdb-client -k
+           --country-db non-existent.mmdb 8.8.8.8)
 endif()
