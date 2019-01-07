@@ -100,6 +100,11 @@ struct MMDB_s_deleter {
 // MMDB_s_uptr is a unique pointer to MMDB_s.
 using MMDB_s_uptr = std::unique_ptr<MMDB_s, MMDB_s_deleter>;
 
+// MKMMDB_NOEXCEPT allows to remove the noexcept specifier in unit tests.
+#ifndef MKMMDB_NOEXCEPT
+#define MKMMDB_NOEXCEPT noexcept
+#endif
+
 // Handle::Impl contains Handle's internals.
 class Handle::Impl {
  public:
@@ -119,21 +124,21 @@ class Handle::Impl {
   // the country code. @param logs is where to store logs. Returns true on
   // success and false on failure.
   bool finish_lookup_cc(MMDB_entry_s *entry, std::string &cc,
-                        std::vector<std::string> &logs) noexcept;
+                        std::vector<std::string> &logs) MKMMDB_NOEXCEPT;
 
   // finish_lookup_asn finishes a ASN lookup. @param entry is the entry that
   // should contain the results. @param asn is the place where we'll write
   // the ASN string. @param logs is where to store logs. Returns true on
   // success and false on failure.
   bool finish_lookup_asn(MMDB_entry_s *entry, std::string &asn,
-                         std::vector<std::string> &logs) noexcept;
+                         std::vector<std::string> &logs) MKMMDB_NOEXCEPT;
 
   // finish_lookup_org finishes a ORG lookup. @param entry is the entry that
   // should contain the results. @param org is the place where we'll write
   // the ORG string. @param logs is where to store logs. Returns true on
   // success and false on failure.
   bool finish_lookup_org(MMDB_entry_s *entry, std::string &org,
-                         std::vector<std::string> &logs) noexcept;
+                         std::vector<std::string> &logs) MKMMDB_NOEXCEPT;
 };
 
 Handle::Handle() noexcept { impl.reset(new Handle::Impl); }
@@ -208,16 +213,28 @@ static bool MMDB_get_value_check(
   return true;
 }
 
-bool Handle::Impl::finish_lookup_cc(MMDB_entry_s *entry, std::string &cc,
-                                    std::vector<std::string> &logs) noexcept {
-  if (!entry) {
-    abort();
-  }
+// MKMMDB_ABORT allows to check in unit tests that we would abort.
+#ifndef MKMMDB_ABORT
+#define MKMMDB_ABORT abort()
+#endif
+
+// MKMMDB_ABORT_IF_NULLPTR calls abort if @p Pointer is nullptr.
+#define MKMMDB_ABORT_IF_NULLPTR(Pointer) \
+  do {                                   \
+    if (Pointer == nullptr) {            \
+      MKMMDB_ABORT;                      \
+    }                                    \
+  } while (0)
+
+bool Handle::Impl::finish_lookup_cc(
+    MMDB_entry_s *entry, std::string &cc,
+    std::vector<std::string> &logs) MKMMDB_NOEXCEPT {
+  MKMMDB_ABORT_IF_NULLPTR(entry);
   MMDB_entry_data_s data{};
   auto mmdb_error = MMDB_get_value(
       entry, &data, "registered_country", "iso_code", nullptr);
   auto ok = MMDB_get_value_check(
-        mmdb_error, data, MMDB_DATA_TYPE_UTF8_STRING, logs);
+      mmdb_error, data, MMDB_DATA_TYPE_UTF8_STRING, logs);
   MKMOCK_HOOK(finish_lookup_cc_check, ok);
   if (!ok) {
     return false;
@@ -234,11 +251,10 @@ bool Handle::lookup_cc(const std::string &ip, std::string &cc,
       });
 }
 
-bool Handle::Impl::finish_lookup_asn(MMDB_entry_s *entry, std::string &asn,
-                                     std::vector<std::string> &logs) noexcept {
-  if (!entry) {
-    abort();
-  }
+bool Handle::Impl::finish_lookup_asn(
+    MMDB_entry_s *entry, std::string &asn,
+    std::vector<std::string> &logs) MKMMDB_NOEXCEPT {
+  MKMMDB_ABORT_IF_NULLPTR(entry);
   MMDB_entry_data_s data{};
   auto mmdb_error = MMDB_get_value(
       entry, &data, "autonomous_system_number", nullptr);
@@ -259,16 +275,15 @@ bool Handle::lookup_asn(const std::string &ip, std::string &asn,
       });
 }
 
-bool Handle::Impl::finish_lookup_org(MMDB_entry_s *entry, std::string &org,
-                                     std::vector<std::string> &logs) noexcept {
-  if (!entry) {
-    abort();
-  }
+bool Handle::Impl::finish_lookup_org(
+    MMDB_entry_s *entry, std::string &org,
+    std::vector<std::string> &logs) MKMMDB_NOEXCEPT {
+  MKMMDB_ABORT_IF_NULLPTR(entry);
   MMDB_entry_data_s data{};
   auto mmdb_error = MMDB_get_value(
       entry, &data, "autonomous_system_organization", nullptr);
   auto ok = MMDB_get_value_check(
-        mmdb_error, data, MMDB_DATA_TYPE_UTF8_STRING, logs);
+      mmdb_error, data, MMDB_DATA_TYPE_UTF8_STRING, logs);
   MKMOCK_HOOK(finish_lookup_org_check, ok);
   if (!ok) {
     return false;
