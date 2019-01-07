@@ -79,8 +79,6 @@ class Handle {
 #include <netdb.h>
 #endif
 
-#include <assert.h>
-
 #include <functional>
 #include <sstream>
 
@@ -212,7 +210,9 @@ static bool MMDB_get_value_check(
 
 bool Handle::Impl::finish_lookup_cc(MMDB_entry_s *entry, std::string &cc,
                                     std::vector<std::string> &logs) noexcept {
-  assert(!!entry);
+  if (!entry) {
+    abort();
+  }
   MMDB_entry_data_s data{};
   auto mmdb_error = MMDB_get_value(
       entry, &data, "registered_country", "iso_code", nullptr);
@@ -234,7 +234,9 @@ bool Handle::lookup_cc(const std::string &ip, std::string &cc,
 
 bool Handle::Impl::finish_lookup_asn(MMDB_entry_s *entry, std::string &asn,
                                      std::vector<std::string> &logs) noexcept {
-  assert(!!entry);
+  if (!entry) {
+    abort();
+  }
   MMDB_entry_data_s data{};
   auto mmdb_error = MMDB_get_value(
       entry, &data, "autonomous_system_number", nullptr);
@@ -255,7 +257,9 @@ bool Handle::lookup_asn(const std::string &ip, std::string &asn,
 
 bool Handle::Impl::finish_lookup_org(MMDB_entry_s *entry, std::string &org,
                                      std::vector<std::string> &logs) noexcept {
-  assert(!!entry);
+  if (!entry) {
+    abort();
+  }
   MMDB_entry_data_s data{};
   auto mmdb_error = MMDB_get_value(
       entry, &data, "autonomous_system_organization", nullptr);
