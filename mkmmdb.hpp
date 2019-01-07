@@ -39,7 +39,7 @@ class Handle {
   /// the internal database handle will be closed first.
   bool open(const std::string &path, std::vector<std::string> &logs) noexcept;
 
-  /// lookup_cc looks the country code (CC) bound to @p ip with the internal
+  /// lookup_cc looks up the country code (CC) bound to @p ip with the internal
   /// database handle. On success, true is returned and @p cc will contain
   /// the country code. On failure, false is returned and @p logs will contain
   /// an explaination of the error that occurred.
@@ -51,8 +51,8 @@ class Handle {
   bool lookup_asn(const std::string &ip, std::string &asn,
                   std::vector<std::string> &logs) noexcept;
 
-  /// lookup_asn is like lookup_cc except that it looks up the autonomous
-  /// system organization anem, which will be saved into @p org.
+  /// lookup_org is like lookup_cc except that it looks up the autonomous
+  /// system organization name, which will be saved into @p org.
   bool lookup_org(const std::string &ip, std::string &org,
                   std::vector<std::string> &logs) noexcept;
 
@@ -94,7 +94,7 @@ namespace mmdb {
 // MMDB_s_deleter is a deleter for a MMDB_s pointer.
 struct MMDB_s_deleter {
   void operator()(MMDB_s *p) {
-    MMDB_close(p);
+    MMDB_close(p);  // handles nullptr gracefully
     delete p;
   }
 };
