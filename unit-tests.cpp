@@ -30,7 +30,7 @@ TEST_CASE("When MMDB_lookup_string fails with mmdb_error") {
 
 TEST_CASE("When MMDB_get_value fails") {
   std::vector<std::string> logs;
-  MMDB_entry_data_s data;
+  MMDB_entry_data_s data{};
   REQUIRE(mk::mmdb::MMDB_get_value_check(
               MMDB_CORRUPT_SEARCH_TREE_ERROR, data, MMDB_DATA_TYPE_UTF8_STRING,
               logs) == false);
@@ -38,14 +38,14 @@ TEST_CASE("When MMDB_get_value fails") {
 
 TEST_CASE("When MMDB_get_value does not contain data") {
   std::vector<std::string> logs;
-  MMDB_entry_data_s data;
+  MMDB_entry_data_s data{};
   REQUIRE(mk::mmdb::MMDB_get_value_check(
               MMDB_SUCCESS, data, MMDB_DATA_TYPE_UTF8_STRING, logs) == false);
 }
 
 TEST_CASE("When MMDB_get_value does not contain the right type") {
   std::vector<std::string> logs;
-  MMDB_entry_data_s data;
+  MMDB_entry_data_s data{};
   data.has_data = true;
   data.type = MMDB_DATA_TYPE_UINT32;
   REQUIRE(mk::mmdb::MMDB_get_value_check(
