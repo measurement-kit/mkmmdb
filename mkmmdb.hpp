@@ -114,7 +114,28 @@ class Handle::Impl {
   // ASN). Returns true on success and false on failure.
   bool lookup(
       const std::string &ip, std::vector<std::string> &logs,
-      std::function<bool(MMDB_entry_s *)> fun);
+      std::function<bool(MMDB_entry_s *)> fun) noexcept;
+
+  // finish_lookup_cc finishes a CC lookup. @param entry is the entry that
+  // should contain the results. @param cc is the place where we'll write
+  // the country code. @param logs is where to store logs. Returns true on
+  // success and false on failure.
+  bool finish_lookup_cc(MMDB_entry_s *entry, std::string &cc,
+                        std::vector<std::string> &logs) noexcept;
+
+  // finish_lookup_asn finishes a ASN lookup. @param entry is the entry that
+  // should contain the results. @param asn is the place where we'll write
+  // the ASN string. @param logs is where to store logs. Returns true on
+  // success and false on failure.
+  bool finish_lookup_asn(MMDB_entry_s *entry, std::string &asn,
+                         std::vector<std::string> &logs) noexcept;
+
+  // finish_lookup_org finishes a ORG lookup. @param entry is the entry that
+  // should contain the results. @param org is the place where we'll write
+  // the ORG string. @param logs is where to store logs. Returns true on
+  // success and false on failure.
+  bool finish_lookup_org(MMDB_entry_s *entry, std::string &org,
+                         std::vector<std::string> &logs) noexcept;
 };
 
 Handle::Handle() noexcept { impl.reset(new Handle::Impl); }
@@ -144,7 +165,7 @@ bool Handle::open(
 
 bool Handle::Impl::lookup(
     const std::string &ip, std::vector<std::string> &logs,
-    std::function<bool(MMDB_entry_s *)> fun) {
+    std::function<bool(MMDB_entry_s *)> fun) noexcept {
   if (db == nullptr) {
     MKMMDB_LOG(logs, "Cannot lookup: the database is not open.");
     return false;
@@ -171,82 +192,97 @@ bool Handle::Impl::lookup(
   return fun(&record.entry);  // OK to throw (and abort) if function not set
 }
 
+bool Handle::Impl::finish_lookup_cc(MMDB_entry_s *entry, std::string &cc,
+                                    std::vector<std::string> &logs) noexcept {
+  assert(!!entry);
+  MMDB_entry_data_s data{};
+  auto mmdb_error = MMDB_get_value(
+      entry, &data, "registered_country", "iso_code", nullptr);
+  MKMOCK_HOOK(MMDB_get_value_registered_country_iso_code, mmdb_error);
+  if (mmdb_error != 0) {
+    MKMMDB_LOG(logs, "MMDB_get_value: " << MMDB_strerror(mmdb_error));
+    return false;
+  }
+  if (!data.has_data) {
+    MKMMDB_LOG(logs, "MMDB_get_value: no data for entry.");
+    return false;
+  }
+  if (data.type != MMDB_DATA_TYPE_UTF8_STRING) {
+    MKMMDB_LOG(logs, "MMDB_get_value: unexpected data type.");
+    return false;
+  }
+  cc = std::string{data.utf8_string, data.data_size};
+  return true;
+}
+
 bool Handle::lookup_cc(const std::string &ip, std::string &cc,
                        std::vector<std::string> &logs) noexcept {
   return impl->lookup(
       ip, logs, [&](MMDB_entry_s *entry) {
-        assert(!!entry);
-        MMDB_entry_data_s data{};
-        auto mmdb_error = MMDB_get_value(
-            entry, &data, "registered_country", "iso_code", nullptr);
-        MKMOCK_HOOK(MMDB_get_value_registered_country_iso_code, mmdb_error);
-        if (mmdb_error != 0) {
-          MKMMDB_LOG(logs, "MMDB_get_value: " << MMDB_strerror(mmdb_error));
-          return false;
-        }
-        if (!data.has_data) {
-          MKMMDB_LOG(logs, "MMDB_get_value: no data for entry.");
-          return false;
-        }
-        if (data.type != MMDB_DATA_TYPE_UTF8_STRING) {
-          MKMMDB_LOG(logs, "MMDB_get_value: unexpected data type.");
-          return false;
-        }
-        cc = std::string{data.utf8_string, data.data_size};
-        return true;
+        return impl->finish_lookup_cc(entry, cc, logs);
       });
+}
+
+bool Handle::Impl::finish_lookup_asn(MMDB_entry_s *entry, std::string &asn,
+                                     std::vector<std::string> &logs) noexcept {
+  assert(!!entry);
+  MMDB_entry_data_s data{};
+  auto mmdb_error = MMDB_get_value(
+      entry, &data, "autonomous_system_number", nullptr);
+  MKMOCK_HOOK(MMDB_get_value_autonomous_system_number, mmdb_error);
+  if (mmdb_error != 0) {
+    MKMMDB_LOG(logs, "MMDB_get_value: " << MMDB_strerror(mmdb_error));
+    return false;
+  }
+  if (!data.has_data) {
+    MKMMDB_LOG(logs, "MMDB_get_value: no data for entry.");
+    return false;
+  }
+  if (data.type != MMDB_DATA_TYPE_UINT32) {
+    MKMMDB_LOG(logs, "MMDB_get_value: unexpected data type.");
+    return false;
+  }
+  asn = std::to_string(data.uint32);
+  return true;
 }
 
 bool Handle::lookup_asn(const std::string &ip, std::string &asn,
                         std::vector<std::string> &logs) noexcept {
   return impl->lookup(
       ip, logs, [&](MMDB_entry_s *entry) {
-        assert(!!entry);
-        MMDB_entry_data_s data{};
-        auto mmdb_error = MMDB_get_value(
-            entry, &data, "autonomous_system_number", nullptr);
-        MKMOCK_HOOK(MMDB_get_value_autonomous_system_number, mmdb_error);
-        if (mmdb_error != 0) {
-          MKMMDB_LOG(logs, "MMDB_get_value: " << MMDB_strerror(mmdb_error));
-          return false;
-        }
-        if (!data.has_data) {
-          MKMMDB_LOG(logs, "MMDB_get_value: no data for entry.");
-          return false;
-        }
-        if (data.type != MMDB_DATA_TYPE_UINT32) {
-          MKMMDB_LOG(logs, "MMDB_get_value: unexpected data type.");
-          return false;
-        }
-        asn = std::to_string(data.uint32);
-        return true;
+        return impl->finish_lookup_asn(entry, asn, logs);
       });
+}
+
+bool Handle::Impl::finish_lookup_org(MMDB_entry_s *entry, std::string &org,
+                                     std::vector<std::string> &logs) noexcept {
+  assert(!!entry);
+  MMDB_entry_data_s data{};
+  auto mmdb_error = MMDB_get_value(
+      entry, &data, "autonomous_system_organization", nullptr);
+  MKMOCK_HOOK(
+      MMDB_get_value_autonomous_system_organization, mmdb_error);
+  if (mmdb_error != 0) {
+    MKMMDB_LOG(logs, "MMDB_get_value: " << MMDB_strerror(mmdb_error));
+    return false;
+  }
+  if (!data.has_data) {
+    MKMMDB_LOG(logs, "MMDB_get_value: no data for entry.");
+    return false;
+  }
+  if (data.type != MMDB_DATA_TYPE_UTF8_STRING) {
+    MKMMDB_LOG(logs, "MMDB_get_value: unexpected data type.");
+    return false;
+  }
+  org = std::string{data.utf8_string, data.data_size};
+  return true;
 }
 
 bool Handle::lookup_org(const std::string &ip, std::string &org,
                         std::vector<std::string> &logs) noexcept {
   return impl->lookup(
       ip, logs, [&](MMDB_entry_s *entry) {
-        assert(!!entry);
-        MMDB_entry_data_s data{};
-        auto mmdb_error = MMDB_get_value(
-            entry, &data, "autonomous_system_organization", nullptr);
-        MKMOCK_HOOK(
-            MMDB_get_value_autonomous_system_organization, mmdb_error);
-        if (mmdb_error != 0) {
-          MKMMDB_LOG(logs, "MMDB_get_value: " << MMDB_strerror(mmdb_error));
-          return false;
-        }
-        if (!data.has_data) {
-          MKMMDB_LOG(logs, "MMDB_get_value: no data for entry.");
-          return false;
-        }
-        if (data.type != MMDB_DATA_TYPE_UTF8_STRING) {
-          MKMMDB_LOG(logs, "MMDB_get_value: unexpected data type.");
-          return false;
-        }
-        org = std::string{data.utf8_string, data.data_size};
-        return true;
+        return impl->finish_lookup_org(entry, org, logs);
       });
 }
 
