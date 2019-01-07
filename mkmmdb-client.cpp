@@ -3,7 +3,7 @@
 #include <iostream>
 #include <ios>
 
-#include "mkmmdb.h"
+#include "mkmmdb.hpp"
 
 int main(int argc, char **argv) {
   if (argc != 2) {
@@ -11,37 +11,29 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
   std::string ip = argv[1];
+  std::clog << std::boolalpha;
   {
-    mkmmdb_uptr db{mkmmdb_open_nonnull("country.mmdb")};
-    if (!mkmmdb_good(db.get())) {
-      std::clog << "Cannot open country.mmdb" << std::endl;
-      // FALLTHROUGH
-    }
-    std::string s = mkmmdb_lookup_cc(db.get(), ip.c_str());
+    std::vector<std::string> logs;
+    mk::mmdb::Handle db;
+    std::string cc;
+    std::clog << "open: " << db.open("country.mmdb", logs) << std::endl;
+    std::clog << "lookup_cc: " << db.lookup_cc(ip, cc, logs) << std::endl;
+    std::clog << "cc: " << cc << std::endl;
     std::clog << "=== BEGIN LOGS === " << std::endl;
-    std::clog << mkmmdb_get_last_lookup_logs(db.get());
+    for (const std::string &s : logs) { std::clog << s; }
     std::clog << "=== END LOGS === " << std::endl;
-    std::clog << "CC: " << s << std::endl;
   }
   {
-    mkmmdb_uptr db{mkmmdb_open_nonnull("asn.mmdb")};
-    if (!mkmmdb_good(db.get())) {
-      std::clog << "Cannot open asn.mmdb" << std::endl;
-      // FALLTHROUGH
-    }
-    {
-      std::string s = mkmmdb_lookup_org(db.get(), ip.c_str());
-      std::clog << "=== BEGIN LOGS === " << std::endl;
-      std::clog << mkmmdb_get_last_lookup_logs(db.get());
-      std::clog << "=== END LOGS === " << std::endl;
-      std::clog << "ORG: " << s << std::endl;
-    }
-    {
-      int64_t v = mkmmdb_lookup_asn(db.get(), ip.c_str());
-      std::clog << "=== BEGIN LOGS === " << std::endl;
-      std::clog << mkmmdb_get_last_lookup_logs(db.get());
-      std::clog << "=== END LOGS === " << std::endl;
-      std::clog << "ASN: " << v << std::endl;
-    }
+    std::vector<std::string> logs;
+    mk::mmdb::Handle db;
+    std::string asn, org;
+    std::clog << "open: " << db.open("asn.mmdb", logs) << std::endl;
+    std::clog << "lookup_asn: " << db.lookup_asn(ip, asn, logs) << std::endl;
+    std::clog << "lookup_org: " << db.lookup_org(ip, org, logs) << std::endl;
+    std::clog << "asn: " << asn << std::endl;
+    std::clog << "org: " << org << std::endl;
+    std::clog << "=== BEGIN LOGS === " << std::endl;
+    for (const std::string &s : logs) { std::clog << s; }
+    std::clog << "=== END LOGS === " << std::endl;
   }
 }
