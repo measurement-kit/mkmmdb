@@ -33,6 +33,7 @@
 /mkmmdb-client.vcxproj.filters
 /mkmmdb.sln
 /mkmock.hpp
+/unit-tests
 /windows-curl-*.tar.gz
 /windows-libmaxminddb-*.tar.gz
 /x64/
