@@ -3,9 +3,6 @@
 
 #include <maxminddb.h>
 
-// By setting MKMOCK_HOOK_ENABLE and including mkmock.hpp we cause mkcurl.hpp
-// to compile with mocking enabled so that we can run unit tests.
-#define MKMOCK_HOOK_ENABLE
 #include "mkmock.hpp"
 
 MKMOCK_DEFINE_HOOK(MMDB_lookup_string_mmdb_error, int);
@@ -22,7 +19,8 @@ MKMOCK_DEFINE_HOOK(finish_lookup_org_check, bool);
 // Include mkmmdb implementation
 // -----------------------------
 
-#define MKMMDB_INLINE_IMPL
+#define MKMMDB_INLINE_IMPL  // inline the implementation
+#define MKMMDB_MOCK         // enable mocking
 #include "mkmmdb.hpp"
 
 TEST_CASE("When MMDB_lookup_string fails with mmdb_error") {

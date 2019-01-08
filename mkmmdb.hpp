@@ -86,6 +86,14 @@ class Handle {
 
 #include "mkmock.hpp"
 
+#ifdef MKMMDB_MOCK
+#define MKMMDB_HOOK MKMOCK_HOOK_ENABLED
+#define MKMMDB_HOOK_ALLOC MKMOCK_HOOK_ALLOC_ENABLED
+#else
+#define MKMMDB_HOOK MKMOCK_HOOK_DISABLED
+#define MKMMDB_HOOK_ALLOC MKMOCK_HOOK_ALLOC_DISABLED
+#endif
+
 namespace mk {
 namespace mmdb {
 
@@ -176,7 +184,7 @@ bool Handle::Impl::lookup(
   auto mmdb_error = 0;
   auto record = MMDB_lookup_string(db.get(), ip.c_str(),
                                    &gai_error, &mmdb_error);
-  MKMOCK_HOOK(MMDB_lookup_string_mmdb_error, mmdb_error);
+  MKMMDB_HOOK(MMDB_lookup_string_mmdb_error, mmdb_error);
   if (gai_error != 0) {
     MKMMDB_LOG(logs, "MMDB_lookup_string: " << gai_strerror(gai_error));
     return false;
@@ -235,7 +243,7 @@ bool Handle::Impl::finish_lookup_cc(
       entry, &data, "registered_country", "iso_code", nullptr);
   auto ok = MMDB_get_value_check(
       mmdb_error, data, MMDB_DATA_TYPE_UTF8_STRING, logs);
-  MKMOCK_HOOK(finish_lookup_cc_check, ok);
+  MKMMDB_HOOK(finish_lookup_cc_check, ok);
   if (!ok) {
     return false;
   }
@@ -259,7 +267,7 @@ bool Handle::Impl::finish_lookup_asn(
   auto mmdb_error = MMDB_get_value(
       entry, &data, "autonomous_system_number", nullptr);
   auto ok = MMDB_get_value_check(mmdb_error, data, MMDB_DATA_TYPE_UINT32, logs);
-  MKMOCK_HOOK(finish_lookup_asn_check, ok);
+  MKMMDB_HOOK(finish_lookup_asn_check, ok);
   if (!ok) {
     return false;
   }
@@ -284,7 +292,7 @@ bool Handle::Impl::finish_lookup_org(
       entry, &data, "autonomous_system_organization", nullptr);
   auto ok = MMDB_get_value_check(
       mmdb_error, data, MMDB_DATA_TYPE_UTF8_STRING, logs);
-  MKMOCK_HOOK(finish_lookup_org_check, ok);
+  MKMMDB_HOOK(finish_lookup_org_check, ok);
   if (!ok) {
     return false;
   }
