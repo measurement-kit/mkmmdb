@@ -46,10 +46,11 @@ class Handle {
   bool lookup_cc(const std::string &ip, std::string &cc,
                  std::vector<std::string> &logs) noexcept;
 
-  /// lookup_asn is like lookup_cc except that it looks up the autonomous
-  /// system number (ASN), which will be saved into the @p cc string.
-  bool lookup_asn(const std::string &ip, std::string &asn,
-                  std::vector<std::string> &logs) noexcept;
+  /// lookup_asn2 is like lookup_cc except that it looks up the autonomous
+  /// system number (ASN), which will be saved into the @p cc string. Please,
+  /// note that the ASN will be in the format `AS<number>`.
+  bool lookup_asn2(const std::string &ip, std::string &asn,
+                   std::vector<std::string> &logs) noexcept;
 
   /// lookup_org is like lookup_cc except that it looks up the autonomous
   /// system organization name, which will be saved into @p org.
@@ -271,12 +272,15 @@ bool Handle::Impl::finish_lookup_asn(
   if (!ok) {
     return false;
   }
-  asn = std::to_string(data.uint32);
+  // Historical note: since version v0.4.0, the ASN that we return is
+  // prefixed with `"AS"`. For this reason we did change the name of
+  // the publicly exposed API from `lookup_asn` to `lookup_asn2`.
+  asn = std::string{"AS"} + std::to_string(data.uint32);
   return true;
 }
 
-bool Handle::lookup_asn(const std::string &ip, std::string &asn,
-                        std::vector<std::string> &logs) noexcept {
+bool Handle::lookup_asn2(const std::string &ip, std::string &asn,
+                         std::vector<std::string> &logs) noexcept {
   return impl->lookup(
       ip, logs, [&](MMDB_entry_s *entry) {
         return impl->finish_lookup_asn(entry, asn, logs);

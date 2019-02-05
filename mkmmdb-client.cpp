@@ -83,6 +83,6 @@ int main(int, char **argv) {
     if (!ok) exit(EXIT_FAILURE);                           \
   } while (0)
   LOOKUP(country_db, cc);
-  LOOKUP(asn_db, asn);
+  LOOKUP(asn_db, asn2);
   LOOKUP(asn_db, org);
 }
