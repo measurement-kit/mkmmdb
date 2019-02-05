@@ -223,14 +223,14 @@ static bool MMDB_get_value_check(
 
 // MKMMDB_ABORT allows to check in unit tests that we would abort.
 #ifndef MKMMDB_ABORT
-#define MKMMDB_ABORT abort()
+#define MKMMDB_ABORT() abort()
 #endif
 
 // MKMMDB_ABORT_IF_NULLPTR calls abort if @p Pointer is nullptr.
 #define MKMMDB_ABORT_IF_NULLPTR(Pointer) \
   do {                                   \
     if (Pointer == nullptr) {            \
-      MKMMDB_ABORT;                      \
+      MKMMDB_ABORT();                    \
     }                                    \
   } while (0)
 

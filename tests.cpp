@@ -11,7 +11,7 @@ MKMOCK_DEFINE_HOOK(finish_lookup_asn_check, bool);
 MKMOCK_DEFINE_HOOK(finish_lookup_org_check, bool);
 
 // Override MKMMDB_ABORT so we can actually verify we would abort
-#define MKMMDB_ABORT throw std::exception()
+#define MKMMDB_ABORT() throw std::exception()
 
 // Disable noexcept specifier for functions that may MKMMDB_ABORT
 #define MKMMDB_NOEXCEPT  // Nothing
