@@ -31,7 +31,7 @@ TEST_CASE("When MMDB_lookup_string fails with mmdb_error") {
         mk::mmdb::Handle handle;
         std::string asn;
         REQUIRE(handle.open("asn.mmdb", logs) == true);
-        REQUIRE(handle.lookup_asn("8.8.8.8", asn, logs) == false);
+        REQUIRE(handle.lookup_asn2("8.8.8.8", asn, logs) == false);
       });
 }
 
@@ -71,7 +71,7 @@ TEST_CASE("When lookup_cc fails because MMDB provides us a bad value") {
       });
 }
 
-TEST_CASE("When lookup_asn fails because MMDB provides us a bad value") {
+TEST_CASE("When lookup_asn2 fails because MMDB provides us a bad value") {
   MKMOCK_WITH_ENABLED_HOOK(
       finish_lookup_asn_check, false,
       {
@@ -79,7 +79,7 @@ TEST_CASE("When lookup_asn fails because MMDB provides us a bad value") {
         mk::mmdb::Handle handle;
         std::string asn;
         REQUIRE(handle.open("asn.mmdb", logs) == true);
-        REQUIRE(handle.lookup_asn("8.8.8.8", asn, logs) == false);
+        REQUIRE(handle.lookup_asn2("8.8.8.8", asn, logs) == false);
       });
 }
 
