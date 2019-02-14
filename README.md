@@ -5,3 +5,28 @@
 Measurement Kit MMDB wrappers. Because this library is a basic building
 block for Measurement Kit, we don't provide any API guarantees (i.e.
 we'll never tag and release `v1.0.0`).
+
+## Regenerating build files
+
+Possibly edit `MKBuild.yaml`, then run:
+
+```
+go get -v github.com/measurement-kit/mkbuild
+mkbuild
+```
+
+## Building
+
+```
+mkdir build
+cd build
+cmake -GNinja ..
+cmake --build .
+ctest -a -j8 --output-on-failure
+```
+
+## Testing with docker
+
+```
+./docker.sh <build-type>
+```

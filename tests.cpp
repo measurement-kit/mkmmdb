@@ -30,7 +30,7 @@ TEST_CASE("When MMDB_lookup_string fails with mmdb_error") {
         std::vector<std::string> logs;
         mk::mmdb::Handle handle;
         std::string asn;
-        REQUIRE(handle.open("asn.mmdb", logs) == true);
+        REQUIRE(handle.open(".mkbuild/download/asn.mmdb", logs) == true);
         REQUIRE(handle.lookup_asn2("8.8.8.8", asn, logs) == false);
       });
 }
@@ -66,7 +66,7 @@ TEST_CASE("When lookup_cc fails because MMDB provides us a bad value") {
         std::vector<std::string> logs;
         mk::mmdb::Handle handle;
         std::string cc;
-        REQUIRE(handle.open("country.mmdb", logs) == true);
+        REQUIRE(handle.open(".mkbuild/download/country.mmdb", logs) == true);
         REQUIRE(handle.lookup_cc("8.8.8.8", cc, logs) == false);
       });
 }
@@ -78,7 +78,7 @@ TEST_CASE("When lookup_asn2 fails because MMDB provides us a bad value") {
         std::vector<std::string> logs;
         mk::mmdb::Handle handle;
         std::string asn;
-        REQUIRE(handle.open("asn.mmdb", logs) == true);
+        REQUIRE(handle.open(".mkbuild/download/asn.mmdb", logs) == true);
         REQUIRE(handle.lookup_asn2("8.8.8.8", asn, logs) == false);
       });
 }
@@ -90,7 +90,7 @@ TEST_CASE("When lookup_org fails because MMDB provides us a bad value") {
         std::vector<std::string> logs;
         mk::mmdb::Handle handle;
         std::string org;
-        REQUIRE(handle.open("asn.mmdb", logs) == true);
+        REQUIRE(handle.open(".mkbuild/download/asn.mmdb", logs) == true);
         REQUIRE(handle.lookup_org("8.8.8.8", org, logs) == false);
       });
 }

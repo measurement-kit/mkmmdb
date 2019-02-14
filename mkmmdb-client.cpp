@@ -22,8 +22,8 @@ static void usage() {
 // LCOV_EXCL_STOP
 
 int main(int, char **argv) {
-  std::string asn_db = "asn.mmdb";
-  std::string country_db = "country.mmdb";
+  std::string asn_db = ".mkbuild/download/asn.mmdb";
+  std::string country_db = ".mkbuild/download/country.mmdb";
   bool keep_going = false;
   std::string ip;
   {
