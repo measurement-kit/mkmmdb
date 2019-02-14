@@ -1,0 +1,35 @@
+name: mkmmdb
+
+docker: bassosimone/mk-debian
+
+dependencies:
+- github.com/adishavit/argh
+- github.com/catchorg/catch2
+- github.com/maxmind/libmaxminddb
+- github.com/measurement-kit/generic-assets
+- github.com/measurement-kit/mkmock
+
+targets:
+  libraries:
+    mkmmdb:
+      compile: [mkmmdb.cpp]
+  executables:
+    tests:
+      compile: [tests.cpp]
+    mkmmdb-client:
+      compile: [mkmmdb-client.cpp]
+      link: [mkmmdb]
+
+tests:
+  mocked_tests:
+    command: tests
+  basic_test:
+    command: mkmmdb-client 8.8.8.8
+  name_not_found_test:
+    command: mkmmdb-client -k 127.0.0.1
+  invalid_ip_test:
+    command: mkmmdb-client -k 8.8.8.x
+  nonexistent_asn_db_test:
+    command: mkmmdb-client -k --asn-db non-existent.mmdb 8.8.8.8
+  nonexistent_country_db_test:
+    command: mkmmdb-client -k --country-db non-existent.mmdb 8.8.8.8
