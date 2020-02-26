@@ -22,9 +22,6 @@ list(APPEND CMAKE_REQUIRED_LIBRARIES Threads::Threads)
 
 if(("${WIN32}"))
   list(APPEND CMAKE_REQUIRED_LIBRARIES ws2_32 crypt32)
-  if(("${MINGW}"))
-    list(APPEND CMAKE_REQUIRED_LIBRARIES -static-libgcc -static-libstdc++)
-  endif()
 endif()
 
 enable_testing()
@@ -38,6 +35,14 @@ if(("${WIN32}"))
     message(FATAL_ERROR "Neither 32 not 64 bit")
   endif()
 endif()
+if((${APPLE}))
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/usr/local/include")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/lib")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -L/usr/local/lib")
+endif()
+
+include(CheckFunctionExists)
+include(CheckSymbolExists)
 
 #
 # argh.h
@@ -46,18 +51,18 @@ endif()
 message(STATUS "mkdirAll: ${CMAKE_BINARY_DIR}/.mkbuild/include")
 execute_process(COMMAND
   ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/.mkbuild/include"
-  RESULT_VARIABLE FAILURE_1155)
-if("${FAILURE_1155}")
-  message(FATAL_ERROR "${FAILURE_1155}")
+  RESULT_VARIABLE FAILURE_1352)
+if("${FAILURE_1352}")
+  message(FATAL_ERROR "${FAILURE_1352}")
 endif()
-message(STATUS "download: https://raw.githubusercontent.com/adishavit/argh/v1.3.0/argh.h")
-file(DOWNLOAD https://raw.githubusercontent.com/adishavit/argh/v1.3.0/argh.h
+message(STATUS "download: https://raw.githubusercontent.com/adishavit/argh/v1.3.1/argh.h")
+file(DOWNLOAD https://raw.githubusercontent.com/adishavit/argh/v1.3.1/argh.h
   "${CMAKE_BINARY_DIR}/.mkbuild/include/argh.h"
   EXPECTED_HASH SHA256=ddb7dfc18dcf90149735b76fb2cff101067453a1df1943a6911233cb7085980c
   TLS_VERIFY ON)
 LIST(APPEND CMAKE_REQUIRED_INCLUDES "${CMAKE_BINARY_DIR}/.mkbuild/include")
-CHECK_INCLUDE_FILE_CXX("argh.h" MK_HAVE_HEADER_1655)
-if(NOT ("${MK_HAVE_HEADER_1655}"))
+CHECK_INCLUDE_FILE_CXX("argh.h" MK_HAVE_HEADER_1852)
+if(NOT ("${MK_HAVE_HEADER_1852}"))
   message(FATAL_ERROR "cannot find: argh.h")
 endif()
 
@@ -68,92 +73,53 @@ endif()
 message(STATUS "mkdirAll: ${CMAKE_BINARY_DIR}/.mkbuild/include")
 execute_process(COMMAND
   ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/.mkbuild/include"
-  RESULT_VARIABLE FAILURE_1979)
-if("${FAILURE_1979}")
-  message(FATAL_ERROR "${FAILURE_1979}")
+  RESULT_VARIABLE FAILURE_2176)
+if("${FAILURE_2176}")
+  message(FATAL_ERROR "${FAILURE_2176}")
 endif()
-message(STATUS "download: https://github.com/catchorg/Catch2/releases/download/v2.3.0/catch.hpp")
-file(DOWNLOAD https://github.com/catchorg/Catch2/releases/download/v2.3.0/catch.hpp
+message(STATUS "download: https://github.com/catchorg/Catch2/releases/download/v2.11.1/catch.hpp")
+file(DOWNLOAD https://github.com/catchorg/Catch2/releases/download/v2.11.1/catch.hpp
   "${CMAKE_BINARY_DIR}/.mkbuild/include/catch.hpp"
-  EXPECTED_HASH SHA256=5eb8532fd5ec0d28433eba8a749102fd1f98078c5ebf35ad607fb2455a000004
+  EXPECTED_HASH SHA256=914690be7714fed1f228679a0e379b4e1f6d7d66f88ac20335b7853ff1a8bc55
   TLS_VERIFY ON)
 LIST(APPEND CMAKE_REQUIRED_INCLUDES "${CMAKE_BINARY_DIR}/.mkbuild/include")
-CHECK_INCLUDE_FILE_CXX("catch.hpp" MK_HAVE_HEADER_2496)
-if(NOT ("${MK_HAVE_HEADER_2496}"))
+CHECK_INCLUDE_FILE_CXX("catch.hpp" MK_HAVE_HEADER_2695)
+if(NOT ("${MK_HAVE_HEADER_2695}"))
   message(FATAL_ERROR "cannot find: catch.hpp")
 endif()
-
-if(("${WIN32}"))
-
-  #
-  # windows-libmaxminddb-1.3.2-2.tar.gz
-  #
-
-  message(STATUS "mkdirAll: ${CMAKE_BINARY_DIR}/.mkbuild/download")
-  execute_process(COMMAND
-    ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/.mkbuild/download"
-    RESULT_VARIABLE FAILURE_2884)
-  if("${FAILURE_2884}")
-    message(FATAL_ERROR "${FAILURE_2884}")
-  endif()
-  message(STATUS "download: https://github.com/measurement-kit/prebuilt/releases/download//testing/windows-libmaxminddb-1.3.2-2.tar.gz")
-  file(DOWNLOAD https://github.com/measurement-kit/prebuilt/releases/download//testing/windows-libmaxminddb-1.3.2-2.tar.gz
-    "${CMAKE_BINARY_DIR}/.mkbuild/download/windows-libmaxminddb-1.3.2-2.tar.gz"
-    EXPECTED_HASH SHA256=542933912814ac518037bd26083d0bba9daf68084f43c5cf2d7ec944d62b9ebb
-    TLS_VERIFY ON)
-  message(STATUS "Extract: ${CMAKE_BINARY_DIR}/.mkbuild/download/windows-libmaxminddb-1.3.2-2.tar.gz")
-  execute_process(COMMAND
-    ${CMAKE_COMMAND} -E tar xf "${CMAKE_BINARY_DIR}/.mkbuild/download/windows-libmaxminddb-1.3.2-2.tar.gz"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/.mkbuild/download"
-    RESULT_VARIABLE FAILURE_3742)
-  if("${FAILURE_3742}")
-    message(FATAL_ERROR "${FAILURE_3742}")
-  endif()
-  LIST(APPEND CMAKE_REQUIRED_INCLUDES "${CMAKE_BINARY_DIR}/.mkbuild/download/MK_DIST/windows/libmaxminddb/1.3.2-2/${MK_WIN32_ARCH}/include")
-  CHECK_INCLUDE_FILE_CXX("maxminddb.h" MK_HAVE_HEADER_3994)
-  if(NOT ("${MK_HAVE_HEADER_3994}"))
-    message(FATAL_ERROR "cannot find: maxminddb.h")
-  endif()
-  CHECK_LIBRARY_EXISTS("${CMAKE_BINARY_DIR}/.mkbuild/download/MK_DIST/windows/libmaxminddb/1.3.2-2/${MK_WIN32_ARCH}/lib/maxminddb.lib" "MMDB_open" "" MK_HAVE_LIB_4153)
-  if(NOT ("${MK_HAVE_LIB_4153}"))
-    message(FATAL_ERROR "cannot find: ${CMAKE_BINARY_DIR}/.mkbuild/download/MK_DIST/windows/libmaxminddb/1.3.2-2/${MK_WIN32_ARCH}/lib/maxminddb.lib")
-  endif()
-  LIST(APPEND CMAKE_REQUIRED_LIBRARIES "${CMAKE_BINARY_DIR}/.mkbuild/download/MK_DIST/windows/libmaxminddb/1.3.2-2/${MK_WIN32_ARCH}/lib/maxminddb.lib")
-else()
-  CHECK_INCLUDE_FILE_CXX("maxminddb.h" MK_HAVE_HEADER_4674)
-  if(NOT ("${MK_HAVE_HEADER_4674}"))
-    message(FATAL_ERROR "cannot find: maxminddb.h")
-  endif()
-  CHECK_LIBRARY_EXISTS("maxminddb" "MMDB_open" "" MK_HAVE_LIB_4833)
-  if(NOT ("${MK_HAVE_LIB_4833}"))
-    message(FATAL_ERROR "cannot find: maxminddb")
-  endif()
-  LIST(APPEND CMAKE_REQUIRED_LIBRARIES "maxminddb")
+CHECK_INCLUDE_FILE_CXX("maxminddb.h" MK_HAVE_HEADER_2842)
+if(NOT ("${MK_HAVE_HEADER_2842}"))
+  message(FATAL_ERROR "cannot find: maxminddb.h")
 endif()
+CHECK_LIBRARY_EXISTS("maxminddb" "MMDB_open" "" MK_HAVE_LIB_2993)
+if(NOT ("${MK_HAVE_LIB_2993}"))
+  message(FATAL_ERROR "cannot find: maxminddb")
+endif()
+LIST(APPEND CMAKE_REQUIRED_LIBRARIES "maxminddb")
 
 #
-# generic-assets-20190205.tar.gz
+# generic-assets-20190520205742.tar.gz
 #
 
 message(STATUS "mkdirAll: ${CMAKE_BINARY_DIR}/.mkbuild/download")
 execute_process(COMMAND
   ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/.mkbuild/download"
-  RESULT_VARIABLE FAILURE_5261)
-if("${FAILURE_5261}")
-  message(FATAL_ERROR "${FAILURE_5261}")
+  RESULT_VARIABLE FAILURE_3409)
+if("${FAILURE_3409}")
+  message(FATAL_ERROR "${FAILURE_3409}")
 endif()
-message(STATUS "download: https://github.com/measurement-kit/generic-assets/releases/download/20190205/generic-assets-20190205.tar.gz")
-file(DOWNLOAD https://github.com/measurement-kit/generic-assets/releases/download/20190205/generic-assets-20190205.tar.gz
-  "${CMAKE_BINARY_DIR}/.mkbuild/download/generic-assets-20190205.tar.gz"
-  EXPECTED_HASH SHA256=e7826c2575bacbc1aeccf64f10bfdf128c7ab38e6f5d17876775937986499df7
+message(STATUS "download: https://github.com/measurement-kit/generic-assets/releases/download/20190520205742/generic-assets-20190520205742.tar.gz")
+file(DOWNLOAD https://github.com/measurement-kit/generic-assets/releases/download/20190520205742/generic-assets-20190520205742.tar.gz
+  "${CMAKE_BINARY_DIR}/.mkbuild/download/generic-assets-20190520205742.tar.gz"
+  EXPECTED_HASH SHA256=70d590c20b2ed31fd43cc63709b267672fecfeac7e908d11e845664ddd43b04f
   TLS_VERIFY ON)
-message(STATUS "Extract: ${CMAKE_BINARY_DIR}/.mkbuild/download/generic-assets-20190205.tar.gz")
+message(STATUS "Extract: ${CMAKE_BINARY_DIR}/.mkbuild/download/generic-assets-20190520205742.tar.gz")
 execute_process(COMMAND
-  ${CMAKE_COMMAND} -E tar xf "${CMAKE_BINARY_DIR}/.mkbuild/download/generic-assets-20190205.tar.gz"
+  ${CMAKE_COMMAND} -E tar xf "${CMAKE_BINARY_DIR}/.mkbuild/download/generic-assets-20190520205742.tar.gz"
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/.mkbuild/download"
-  RESULT_VARIABLE FAILURE_6080)
-if("${FAILURE_6080}")
-  message(FATAL_ERROR "${FAILURE_6080}")
+  RESULT_VARIABLE FAILURE_4270)
+if("${FAILURE_4270}")
+  message(FATAL_ERROR "${FAILURE_4270}")
 endif()
 
 #
@@ -163,9 +129,9 @@ endif()
 message(STATUS "mkdirAll: ${CMAKE_BINARY_DIR}/.mkbuild/include")
 execute_process(COMMAND
   ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/.mkbuild/include"
-  RESULT_VARIABLE FAILURE_6367)
-if("${FAILURE_6367}")
-  message(FATAL_ERROR "${FAILURE_6367}")
+  RESULT_VARIABLE FAILURE_4557)
+if("${FAILURE_4557}")
+  message(FATAL_ERROR "${FAILURE_4557}")
 endif()
 message(STATUS "download: https://raw.githubusercontent.com/measurement-kit/mkmock/v0.2.0/mkmock.hpp")
 file(DOWNLOAD https://raw.githubusercontent.com/measurement-kit/mkmock/v0.2.0/mkmock.hpp
@@ -173,8 +139,8 @@ file(DOWNLOAD https://raw.githubusercontent.com/measurement-kit/mkmock/v0.2.0/mk
   EXPECTED_HASH SHA256=f07bc063a2e64484482f986501003e45ead653ea3f53fadbdb45c17a51d916d2
   TLS_VERIFY ON)
 LIST(APPEND CMAKE_REQUIRED_INCLUDES "${CMAKE_BINARY_DIR}/.mkbuild/include")
-CHECK_INCLUDE_FILE_CXX("mkmock.hpp" MK_HAVE_HEADER_6895)
-if(NOT ("${MK_HAVE_HEADER_6895}"))
+CHECK_INCLUDE_FILE_CXX("mkmock.hpp" MK_HAVE_HEADER_5085)
+if(NOT ("${MK_HAVE_HEADER_5085}"))
   message(FATAL_ERROR "cannot find: mkmock.hpp")
 endif()
 
@@ -207,17 +173,19 @@ macro(MKSetRestrictiveCompilerFlags)
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
       set(MK_COMMON_FLAGS "${MK_COMMON_FLAGS} -Wtrampolines")
     endif()
-    set(MK_COMMON_FLAGS "${MK_COMMON_FLAGS} -Woverloaded-virtual")
-    set(MK_COMMON_FLAGS "${MK_COMMON_FLAGS} -Wreorder")
-    set(MK_COMMON_FLAGS "${MK_COMMON_FLAGS} -Wsign-promo")
-    set(MK_COMMON_FLAGS "${MK_COMMON_FLAGS} -Wnon-virtual-dtor")
+    set(MK_CXX_FLAGS "${MK_CXX_FLAGS} -Woverloaded-virtual")
+    set(MK_CXX_FLAGS "${MK_CXX_FLAGS} -Wreorder")
+    set(MK_CXX_FLAGS "${MK_CXX_FLAGS} -Wsign-promo")
+    set(MK_CXX_FLAGS "${MK_CXX_FLAGS} -Wnon-virtual-dtor")
     set(MK_COMMON_FLAGS "${MK_COMMON_FLAGS} -fstack-protector-all")
-    if(NOT "${APPLE}")
+    if(NOT "${APPLE}" AND NOT "${MINGW}")
       set(MK_LD_FLAGS "${MK_LD_FLAGS} -Wl,-z,noexecstack")
       set(MK_LD_FLAGS "${MK_LD_FLAGS} -Wl,-z,now")
       set(MK_LD_FLAGS "${MK_LD_FLAGS} -Wl,-z,relro")
       set(MK_LD_FLAGS "${MK_LD_FLAGS} -Wl,-z,nodlopen")
       set(MK_LD_FLAGS "${MK_LD_FLAGS} -Wl,-z,nodump")
+    elseif(("${MINGW}"))
+      set(MK_LD_FLAGS "${MK_LD_FLAGS} -static")
     endif()
     add_definitions(-D_FORTIFY_SOURCES=2)
   elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
