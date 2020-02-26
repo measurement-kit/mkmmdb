@@ -1,6 +1,7 @@
 name: mkmmdb
 
 docker: bassosimone/mk-debian
+docker_tc_disabled: true
 
 dependencies:
 - github.com/adishavit/argh
